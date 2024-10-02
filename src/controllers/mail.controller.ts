@@ -11,8 +11,8 @@ export const sendMail =async  (receiver_email:any, subject:any, email_body:any)=
         const message = {
            to: receiver_email, 
            from:{
-               name:'Hamid',
-               email:'hamid@icopystory.com'
+               name:`${process.env.SEND_GRID_NAME}`,
+               email:`${process.env.SEND_GRID_EMAIL}`
            },
            subject,
            text:'Email from Easytopup',

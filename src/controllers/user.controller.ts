@@ -66,7 +66,7 @@ export const verifyAccount = async (req:any, res:any, next:any)=>{
         const checkCode = await UserModel.findOne({confirmationCode:ref})
         if(!checkCode) return res.status(400).send('Failed to verify account')
 
-        checkCode.confirmationCode = "verified"
+        checkCode.status = "verified"
         checkCode.save()
         res.json({
             status:'success',
