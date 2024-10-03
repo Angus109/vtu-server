@@ -9,6 +9,7 @@ import Payment from './routes/payment.route'
 import VTU from './routes/vtu.route'
 import Review from './routes/review.route'
 import Admin from './routes/admin.route'
+import Affiliate from './routes/affiliate.route'
 
 config();
 
@@ -30,6 +31,7 @@ app.use('/api/pay', Payment)
 app.use('/api/vtu', VTU )
 app.use('/api/review', Review )
 app.use('/api/admin', Admin )
+app.use('/api/affiliate', Affiliate)
 
 const PORT = process.env.PORT || 3500 || 4000
 
