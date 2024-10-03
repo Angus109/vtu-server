@@ -16,7 +16,7 @@ router.delete('/',auth, deleteUser)
 router.get('/all',auth, getAllUsers)
 router.get('/',auth, getUser)
 router.post('/auth', AuthUser)
-router.post('/verify_account', verifyAccount )
+router.post('/verify_account/:code', verifyAccount )
 router.put('/', ResetUser)
 
 
