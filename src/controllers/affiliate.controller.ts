@@ -6,6 +6,7 @@ const config = CONFIG()
 import { PaymentModel } from '../models/payment.model'
 import { sendMail } from './mail.controller'
 import { ValidateAffiliate, AffiliateModel } from '../models/affiliate.model'
+import { AdminModel } from '../models/admin.model'
 
 
 
@@ -16,7 +17,7 @@ export const createAffiliate = async (req: any, res: any, next: any) => {
         success: false,
         message: error.details[0].message
     })
-    const checkAdmin = await AffiliateModel.findOne({ _id: req.body._id})
+    const checkAdmin = await AdminModel.findById(req.user._doc._id)
     if (!checkAdmin) {
         return res.status403(403).send({
             success: false,
@@ -77,11 +78,11 @@ a {
 <body>
 <h1>Welcome to the VTU Top-Up Admin Panel!</h1>
 
-<p>Dear ${req.body.fname} ${req.body.}</p>
+<p>Dear ${req.body.firstName} ${req.body.lastName}</p>
 
 <p>We're excited to welcome you as a new affiliate to the VTU Top-Up Admin Panel. Your dedication to providing exceptional service to your customers is truly commendable.</p>
 
-<p>To get started, please <a href="https://your-admin-panel-url">log in to the admin panel</a> using your credentials. You'll find a wealth of resources and tools to help you manage your affiliate account and offer top-notch VTU services.</p>
+<p>To get started, please <a href="${process.env.DASHBOARD_URL}/affiliate_login">login to your dashbord</a> using your credentials. You'll find a wealth of resources and tools to help you manage your affiliate account and offer top-notch VTU services.</p>
 
 <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
 
@@ -107,7 +108,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
         success: false,
         message: error.details[0].message
     })
-    if (!req.body.verificationCode) {
+    if (!req.params.code) {
         return res.status(400).send({
             success: true,
             message: "verificationCode is required"
@@ -117,7 +118,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
 
     try {
         const checkAffiliate = await AffiliateModel.findOne({ email: req.body.email })
-        if (checkAffiliate.verificationCode !== req.body.verificationCode || Date.now() > checkAffiliate.verificationCodeExpiresAt) return res.status(401).send('Invalid verification code or code expired')
+        if (checkAffiliate.verificationCode !== req.params.code || Date.now() > checkAffiliate.verificationCodeExpiresAt) return res.status(401).send('Invalid verification code or code expired')
 
         const token = jwt.sign({ email: req.body.email }, `${process.env.JWT_SECRET}`)
         res.cookie("jwt", token, {
@@ -216,18 +217,15 @@ export const getAllAffiliates = async (req: any, res: any, next: any) => {
 }
 
 export const deleteAffililates = async (req: any, res: any, next: any) => {
-    if (!req.params.id) {
-        return res.status(400).send({
-            sucess: true,
-            message: "param id is required"
-        })
-    }
+
+
+
     try {
-        const deleteAffililate = await AffiliateModel.findByIdAndDelete(req.params.id)
+        const deleteAffililate = await AffiliateModel.findByIdAndDelete(req.user._doc._id)
         if (deleteAffililate) {
             res.json({
                 status: 'success',
-                message: 'Post deleted successfully'
+                message: 'account deleted successfully'
             })
         }
     } catch (ex) {
@@ -238,14 +236,22 @@ export const deleteAffililates = async (req: any, res: any, next: any) => {
 
 export const suspendAffililates = async (req: any, res: any, next: any) => {
 
-    if (!req.params._id) {
+    const checkAdmin = await AdminModel.findById(req.user._doc._id)
+    if (!checkAdmin) {
+        return res.status403(403).send({
+            success: false,
+            message: "unauthorized"
+        })
+    }
+
+    if (!req.params.id) {
         return res.status(400).send({
             sucess: true,
             message: "id is required"
         })
     }
 
-    if (!req.body.status) {
+    if (!req.params.status) {
         return res.status(400).send({
             sucess: true,
             message: "status is required"
@@ -253,15 +259,15 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
     }
     try {
 
-        if (req.body.status === "suspended") {
-            const checkAffiliate = await AffiliateModel.findOne({ _id: req.params._id })
+        if (req.params.status === "suspend") {
+            const checkAffiliate = await AffiliateModel.findById({ _id: req.params.id })
             checkAffiliate.status = "suspended"
             await checkAffiliate.save()
         }
 
-        if (req.body.status === "suspended") {
-            const checkAffiliate = await AffiliateModel.findOne({ _id: req.params._id })
-            checkAffiliate.status = "suspended"
+        if (req.params.status === "activate") {
+            const checkAffiliate = await AffiliateModel.findById({ _id: req.params.id })
+            checkAffiliate.status = "active"
             await checkAffiliate.save()
         }
 
