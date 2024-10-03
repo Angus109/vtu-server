@@ -110,7 +110,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
     })
     if (!req.params.code) {
         return res.status(400).send({
-            success: true,
+            success: false,
             message: "verificationCode is required"
         })
     }
