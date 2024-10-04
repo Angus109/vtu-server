@@ -117,7 +117,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
 
 
     try {
-        const now = new Date(); // Get the current date and time
+        const now = new Date(Date.now()); // Get the current date and time
         console.log(now)
         console.log(req.query.code)
         const checkAffiliate = await AffiliateModel.findOne({ email: req.body.email })
