@@ -108,7 +108,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
         success: false,
         message: error.details[0].message
     })
-    if (!req.params.code) {
+    if (!req.query.code) {
         return res.status(400).send({
             success: false,
             message: "verificationCode is required"
@@ -118,8 +118,10 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
 
     try {
         const now = new Date(); // Get the current date and time
+        console.log(now)
+        console.log(req.query.code)
         const checkAffiliate = await AffiliateModel.findOne({ email: req.body.email })
-        if (checkAffiliate.verificationCode !== req.params.code || now > checkAffiliate.verificationCodeExpiresAt) return res.status(401).send('Invalid verification code or code expired')
+        if (checkAffiliate.verificationCode !== req.query.code || now > checkAffiliate.verificationCodeExpiresAt) return res.status(401).send('Invalid verification code or code expired')
 
         const token = jwt.sign({ email: req.body.email }, `${process.env.JWT_SECRET}`)
         res.cookie("jwt", token, {
@@ -245,14 +247,14 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
         })
     }
 
-    if (!req.params.id) {
+    if (!req.query.id) {
         return res.status(400).send({
             sucess: true,
             message: "id is required"
         })
     }
 
-    if (!req.params.status) {
+    if (!req.query.status) {
         return res.status(400).send({
             sucess: true,
             message: "status is required"
@@ -260,14 +262,14 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
     }
     try {
 
-        if (req.params.status === "suspend") {
-            const checkAffiliate = await AffiliateModel.findById({ _id: req.params.id })
+        if (req.query.status === "suspend") {
+            const checkAffiliate = await AffiliateModel.findById({ _id: req.query.id })
             checkAffiliate.status = "suspended"
             await checkAffiliate.save()
         }
 
-        if (req.params.status === "activate") {
-            const checkAffiliate = await AffiliateModel.findById({ _id: req.params.id })
+        if (req.query.status === "activate") {
+            const checkAffiliate = await AffiliateModel.findById({ _id: req.query.id })
             checkAffiliate.status = "active"
             await checkAffiliate.save()
         }
