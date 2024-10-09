@@ -117,7 +117,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
 
 
     try {
-        const now = new Date(Date.now()); // Get the current date and time
+        const now = new Date(Date.now() + 60000); // Get the current date and time
         console.log(now)
         console.log(req.query.code)
         const checkAffiliate = await AffiliateModel.findOne({ email: req.body.email })
@@ -162,7 +162,7 @@ export const AuthAfiliate = async (req: any, res: any, next: any) => {
 
         // Set verification code and expiration time in user document
         findAffiliate.verificationCode = verificationCode;
-        findAffiliate.verificationCodeExpiresAt = new Date(Date.now() + 3600000); // 1 hour from now
+        findAffiliate.verificationCodeExpiresAt = new Date(Date.now() + 3660000); // 1 hour from now
 
 
         await findAffiliate.save()
