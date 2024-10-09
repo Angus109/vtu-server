@@ -117,11 +117,22 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
 
 
     try {
-        const now = new Date(Date.now() + 60000); // Get the current date and time
-        console.log(now)
+        const newDate = new Date(Date.now() + 60000); // Get the current date and time
+        console.log(newDate)
         console.log(req.query.code)
         const checkAffiliate = await AffiliateModel.findOne({ email: req.body.email })
-        if (checkAffiliate.verificationCode !== req.query.code || now >= checkAffiliate.verificationCodeExpiresAt) return res.status(401).send('Invalid verification code or code expired')
+        if(!checkAffiliate){
+            return res.status(404).send({
+                success: false,
+                message: "affiliate not found"
+            })
+        }
+        if (checkAffiliate.verificationCode !== req.query.code || newDate >= checkAffiliate.verificationCodeExpiresAt) return res.status(401).send({
+            sucess: false,
+            message: 'Invalid verification code or code expired',
+            newDate: newDate,
+            expireDate: checkAffiliate.verificationCodeExpiresAt
+        })
 
         const token = jwt.sign({ email: req.body.email }, `${process.env.JWT_SECRET}`)
         res.cookie("jwt", token, {
@@ -162,7 +173,7 @@ export const AuthAfiliate = async (req: any, res: any, next: any) => {
 
         // Set verification code and expiration time in user document
         findAffiliate.verificationCode = verificationCode;
-        findAffiliate.verificationCodeExpiresAt = new Date(Date.now() + 3660000); // 1 hour from now
+        findAffiliate.verificationCodeExpiresAt = new Date(Date.now() + 7260000); // 2 hour from now
 
 
         await findAffiliate.save()
