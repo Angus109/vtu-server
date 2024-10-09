@@ -121,7 +121,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
         console.log(now)
         console.log(req.query.code)
         const checkAffiliate = await AffiliateModel.findOne({ email: req.body.email })
-        if (checkAffiliate.verificationCode !== req.query.code || now > checkAffiliate.verificationCodeExpiresAt) return res.status(401).send('Invalid verification code or code expired')
+        if (checkAffiliate.verificationCode !== req.query.code || now >= checkAffiliate.verificationCodeExpiresAt) return res.status(401).send('Invalid verification code or code expired')
 
         const token = jwt.sign({ email: req.body.email }, `${process.env.JWT_SECRET}`)
         res.cookie("jwt", token, {
