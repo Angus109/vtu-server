@@ -127,7 +127,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
                 message: "affiliate not found"
             })
         }
-        if (checkAffiliate.verificationCode !== req.query.code || newDate >= checkAffiliate.verificationCodeExpiresAt) return res.status(401).send({
+        if (checkAffiliate.verificationCode !== req.query.code || newDate >= new Date(checkAffiliate.verificationCodeExpiresAt)) return res.status(401).send({
             sucess: false,
             message: 'Invalid verification code or code expired',
             newDate: newDate,
