@@ -7,6 +7,7 @@ import { PaymentModel } from '../models/payment.model'
 import { sendMail } from './mail.controller'
 import { ValidateAffiliate, AffiliateModel } from '../models/affiliate.model'
 import { AdminModel } from '../models/admin.model'
+import { cloneDeep } from 'lodash'
 
 
 
@@ -127,13 +128,23 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
                 message: "affiliate not found"
             })
         }
-        if (checkAffiliate.verificationCode !== req.query.code || newDate >= new Date(checkAffiliate.verificationCodeExpiresAt)) return res.status(401).send({
+        if (checkAffiliate.verificationCode !== req.query.code) return res.status(401).send({
             sucess: false,
-            message: 'Invalid verification code or code expired',
-            newDate: newDate,
-            expireDate: checkAffiliate.verificationCodeExpiresAt
+            message: 'Invalid verification code ',
+            newDate: new Date(Date.now() + 60000),
+            expireDate: checkAffiliate.verificationCodeExpiresAt,
+            code: req.query.code
         })
 
+        if(new Date(Date.now() + 60000) >= new Date(checkAffiliate.verificationCodeExpiresAt)){
+            return res.status(401).send({
+            sucess: false,
+            message: 'code expired',
+            newDate: new Date(Date.now() + 60000),
+            expireDate: checkAffiliate.verificationCodeExpiresAt
+            })
+        }
+        
         const token = jwt.sign({ email: req.body.email }, `${process.env.JWT_SECRET}`)
         res.cookie("jwt", token, {
             expires: new Date(Date.now() + 25892000000),
