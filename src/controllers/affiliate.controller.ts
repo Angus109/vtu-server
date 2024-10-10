@@ -105,6 +105,8 @@ a {
 
 export const verifyAccount = async (req: any, res: any, next: any) => {
     const { error } = Validate(req.body)
+
+    const codeInterger = parseInt(req.query.code)
     if (error) return res.status(400).send({
         success: false,
         message: error.details[0].message
@@ -128,20 +130,20 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
                 message: "affiliate not found"
             })
         }
-        if (checkAffiliate.verificationCode !== req.query.code) return res.status(401).send({
+        if (checkAffiliate.verificationCode !== codeInterger) return res.status(404).send({
             sucess: false,
-            message: 'Invalid verification code ',
-            newDate: new Date(Date.now() + 60000),
-            expireDate: checkAffiliate.verificationCodeExpiresAt,
-            code: req.query.code
+            message: 'Invalid verification code',
+            // newDate: new Date(Date.now() + 60000),
+            // expireDate: checkAffiliate.verificationCodeExpiresAt,
+
         })
 
         if(new Date(Date.now() + 60000) >= new Date(checkAffiliate.verificationCodeExpiresAt)){
-            return res.status(401).send({
+            return res.status(404).send({
             sucess: false,
             message: 'code expired',
-            newDate: new Date(Date.now() + 60000),
-            expireDate: checkAffiliate.verificationCodeExpiresAt
+            // newDate: new Date(Date.now() + 60000),
+            // expireDate: checkAffiliate.verificationCodeExpiresAt
             })
         }
         
