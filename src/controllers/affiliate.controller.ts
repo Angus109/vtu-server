@@ -7,7 +7,7 @@ import { PaymentModel } from '../models/payment.model'
 import { sendMail } from './mail.controller'
 import { ValidateAffiliate, AffiliateModel } from '../models/affiliate.model'
 import { AdminModel } from '../models/admin.model'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, result } from 'lodash'
 
 
 
@@ -120,9 +120,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
 
 
     try {
-        const newDate = new Date(Date.now() + 60000); // Get the current date and time
-        console.log(newDate)
-        console.log(req.query.code)
+       
         const checkAffiliate = await AffiliateModel.findOne({ email: req.body.email })
         if(!checkAffiliate){
             return res.status(404).send({
@@ -132,18 +130,14 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
         }
         if (checkAffiliate.verificationCode !== codeInterger) return res.status(404).send({
             sucess: false,
-            message: 'Invalid verification code',
-            // newDate: new Date(Date.now() + 60000),
-            // expireDate: checkAffiliate.verificationCodeExpiresAt,
-
+            message: 'Invalid verification code'
         })
 
         if(new Date(Date.now() + 60000) >= new Date(checkAffiliate.verificationCodeExpiresAt)){
             return res.status(404).send({
             sucess: false,
-            message: 'code expired',
-            // newDate: new Date(Date.now() + 60000),
-            // expireDate: checkAffiliate.verificationCodeExpiresAt
+            message: 'code expired'
+    
             })
         }
         
@@ -156,6 +150,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
         res.json({
             success: true,
             message: 'login successfully',
+            result: checkAffiliate,
             token: token
         })
     } catch (ex) {
@@ -213,9 +208,8 @@ export const AuthAfiliate = async (req: any, res: any, next: any) => {
 export const getAffiliate = async (req: any, res: any, next: any) => {
     try {
         const affiliate = await AffiliateModel.findById(req.user._doc._id)
-        affiliate.password = ""
         res.json({
-            status: 'success',
+            sucess: true,
             data: affiliate
         })
     } catch (error) {
@@ -264,6 +258,7 @@ export const deleteAffililates = async (req: any, res: any, next: any) => {
 export const suspendAffililates = async (req: any, res: any, next: any) => {
 
     const checkAdmin = await AdminModel.findById(req.user._doc._id)
+
     if (!checkAdmin) {
         return res.status403(403).send({
             success: false,
@@ -271,17 +266,19 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
         })
     }
 
-    if (!req.query.id) {
-        return res.status(400).send({
+
+
+    if (!req.query.status) {
+        return res.status(403).send({
             sucess: true,
-            message: "id is required"
+            message: "status is required"
         })
     }
 
-    if (!req.query.status) {
-        return res.status(400).send({
-            sucess: true,
-            message: "status is required"
+    if(!req.query.id){
+        return res.status(404).send({
+            success: false,
+            message:"id is required"
         })
     }
     try {
