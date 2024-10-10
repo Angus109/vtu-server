@@ -20,7 +20,7 @@ export const createAffiliate = async (req: any, res: any, next: any) => {
     })
     const checkAdmin = await AdminModel.findById(req.user._doc._id)
     if (!checkAdmin) {
-        return res.status403(403).send({
+        return res.status(403).send({
             success: false,
             message: "unauthorized"
         })
@@ -128,13 +128,13 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
                 message: "affiliate not found"
             })
         }
-        if (checkAffiliate.verificationCode !== codeInterger) return res.status(404).send({
+        if (checkAffiliate.verificationCode !== codeInterger) return res.status(403).send({
             sucess: false,
             message: 'Invalid verification code'
         })
 
         if(new Date(Date.now() + 60000) >= new Date(checkAffiliate.verificationCodeExpiresAt)){
-            return res.status(404).send({
+            return res.status(403).send({
             sucess: false,
             message: 'code expired'
     
@@ -171,7 +171,7 @@ export const AuthAfiliate = async (req: any, res: any, next: any) => {
 
     try {
         const findAffiliate = await AffiliateModel.findOne({ email: req.body.email })
-        if (!findAffiliate) return res.status(401).send({
+        if (!findAffiliate) return res.status(404).send({
             success: false,
             message: "email not found"
         })
@@ -213,7 +213,7 @@ export const getAffiliate = async (req: any, res: any, next: any) => {
             data: affiliate
         })
     } catch (error) {
-        res.status(403).send(error)
+        res.status(500).send(error)
     }
 }
 
@@ -260,7 +260,7 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
     const checkAdmin = await AdminModel.findById(req.user._doc._id)
 
     if (!checkAdmin) {
-        return res.status403(403).send({
+        return res.status(401).send({
             success: false,
             message: "unauthorized"
         })
@@ -276,7 +276,7 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
     }
 
     if(!req.query.id){
-        return res.status(404).send({
+        return res.status(403).send({
             success: false,
             message:"id is required"
         })
