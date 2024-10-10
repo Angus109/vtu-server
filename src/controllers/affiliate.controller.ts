@@ -141,7 +141,7 @@ export const verifyAccount = async (req: any, res: any, next: any) => {
             })
         }
         
-        const token = jwt.sign({ email: req.body.email }, `${process.env.JWT_SECRET}`)
+        const token = jwt.sign({ ...checkAffiliate}, `${process.env.JWT_SECRET}`)
         res.cookie("jwt", token, {
             expires: new Date(Date.now() + 25892000000),
             httpOnly: true,
