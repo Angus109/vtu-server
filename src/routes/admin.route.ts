@@ -7,7 +7,7 @@ import { suspendAffililates } from '../controllers/affiliate.controller'
  router.post('/', createAdmin )
  router.post('/auth', AuthAdmin)
  router.get('/', auth, getAdmin)
- router.put('/', suspendAffililates)
+ router.put('/action', auth, suspendAffililates)
  
 
  export default router
