@@ -284,19 +284,22 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
     try {
 
         if (req.query.status === "suspend") {
-            const checkAffiliate = await AffiliateModel.findById({ _id: req.query.id })
+            const checkAffiliate = await AffiliateModel.findById(req.query.id)
             checkAffiliate.status = "suspended"
             await checkAffiliate.save()
         }
 
         if (req.query.status === "activate") {
-            const checkAffiliate = await AffiliateModel.findById({ _id: req.query.id })
+            const checkAffiliate = await AffiliateModel.findById(req.query.id)
             checkAffiliate.status = "active"
             await checkAffiliate.save()
         }
 
     } catch (ex) {
-        res.status(500).send('Failed to delete Affiliate. Server Error')
+        res.status(500).send({
+            success: false,
+            error: ex
+        })
     }
 }
 
