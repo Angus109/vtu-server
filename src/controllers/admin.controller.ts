@@ -61,6 +61,7 @@ export const AuthAdmin = async (req:any, res:any, next:any)=>{
         res.json({
             status:'success',
             message:'Login successful',
+            data: checkAdmin,
             token,
            
         })
