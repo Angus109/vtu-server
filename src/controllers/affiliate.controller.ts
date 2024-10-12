@@ -257,6 +257,8 @@ export const deleteAffililates = async (req: any, res: any, next: any) => {
 
 export const suspendAffililates = async (req: any, res: any, next: any) => {
 
+    
+
     const checkAdmin = await AdminModel.findById(req.user._doc._id)
 
     if (!checkAdmin) {
@@ -266,16 +268,17 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
         })
     }
 
+   
 
 
     if (!req.query.status) {
         return res.status(403).send({
-            sucess: true,
+            sucess: false,
             message: "status is required"
         })
     }
 
-    if(!req.query.affiliateId){
+    if(!req.query.id){
         return res.status(403).send({
             success: false,
             message:"id is required"
@@ -283,16 +286,30 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
     }
     try {
 
+
         if (req.query.status === "suspend") {
-            const checkAffiliate = await AffiliateModel.findById(req.query.affiliateId)
-            checkAffiliate.status = "suspended"
-            await checkAffiliate.save()
+            const suspendAffiliate = await AffiliateModel.findOneAndUpdate({ _v: req.query.id}, {
+               status:"suspended" 
+            })
+            return res.status(200).send({
+                success : true,
+                result: suspendAffiliate,
+                message: "affiliate suspended"
+            })
+           
         }
 
         if (req.query.status === "activate") {
-            const checkAffiliate = await AffiliateModel.findById(req.query.affiliateId)
-            checkAffiliate.status = "active"
-            await checkAffiliate.save()
+            const activateAffiliate = await AffiliateModel.findOneAndUpdate({_v:req.query.id}, {
+                status: "active"
+            })
+            return res.status(200).send({
+                success: true,
+                message: "affiliate activated",
+                result: activateAffiliate
+
+            })
+           
         }
 
     } catch (ex) {
