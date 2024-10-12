@@ -275,7 +275,7 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
         })
     }
 
-    if(!req.query.id){
+    if(!req.query.affiliateId){
         return res.status(403).send({
             success: false,
             message:"id is required"
@@ -284,13 +284,13 @@ export const suspendAffililates = async (req: any, res: any, next: any) => {
     try {
 
         if (req.query.status === "suspend") {
-            const checkAffiliate = await AffiliateModel.findById(req.query.id)
+            const checkAffiliate = await AffiliateModel.findById(req.query.affiliateId)
             checkAffiliate.status = "suspended"
             await checkAffiliate.save()
         }
 
         if (req.query.status === "activate") {
-            const checkAffiliate = await AffiliateModel.findById(req.query.id)
+            const checkAffiliate = await AffiliateModel.findById(req.query.affiliateId)
             checkAffiliate.status = "active"
             await checkAffiliate.save()
         }
